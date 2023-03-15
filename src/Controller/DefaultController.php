@@ -15,7 +15,7 @@ class DefaultController extends AbstractController
     /**
      * @Route("/")
      */
-    public function index(Request $request, EntityManagerInterface $entityManager): Response
+    public function index(EntityManagerInterface $entityManager): Response
     {  
 
         $user = new User();
