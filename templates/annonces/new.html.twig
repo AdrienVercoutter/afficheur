@@ -1,0 +1,11 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Nouvelle Image{% endblock %}
+
+{% block body %}
+    <h1>Créé une nouvelle image</h1>
+
+    {{ include('annonces/_form.html.twig') }}
+
+    <a href="{{ path('app_annonces_index') }}">Retour a l'acceuil</a>
+{% endblock %}
