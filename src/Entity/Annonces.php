@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use Symfony\Component\OptionsResolver\OptionsResolver;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -89,12 +90,19 @@ class Annonces
     {
         if ($this->images->contains($image)) {
             $this->images->removeElement($image);
-            // set the owning side to null (unless already changed)
+
             if ($image->getAnnonces() === $this) {
                 $image->setAnnonces(null);
             }
         }
 
         return $this;
+    }
+
+    public function configureOptions(OptionsResolver $resolver): void
+    {
+        $resolver->setDefaults([
+            'data_class' => Annonces::class,
+        ]);
     }
 }

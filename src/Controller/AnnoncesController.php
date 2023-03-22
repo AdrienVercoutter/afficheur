@@ -5,7 +5,6 @@ namespace App\Controller;
 use App\Entity\Annonces;
 use App\Entity\Images;
 use App\Form\AnnoncesType;
-// use App\Controller\JsonResponse;
 use App\Repository\AnnoncesRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
@@ -15,23 +14,19 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
 
-/**
- * @Route("/")
- */
 class AnnoncesController extends AbstractController
 {
-    /**
-     * @Route("/", name="app_annonces_index", methods={"GET"})
-     */
-
     private $entityManager;
 
     public function __construct(EntityManagerInterface $entityManager)
-        {
-            $this->entityManager = $entityManager;
-        }
-    
-    public function index(AnnoncesRepository $annoncesRepository): Response
+    {
+        $this->entityManager = $entityManager;
+    }
+
+    /**
+     * @Route("/", name="app_annonces_index", methods={"GET"})
+     */
+    public function indexAction(AnnoncesRepository $annoncesRepository): Response
     {
         return $this->render('annonces/index.html.twig', [
             'annonces' => $annoncesRepository->findAll(),
@@ -39,9 +34,9 @@ class AnnoncesController extends AbstractController
     }
 
     /**
-     * @Route("/", name="app_annonces_new", methods={"GET", "POST"})
+     * @Route("/create", name="app_annonces_create", methods={"GET", "POST"})
      */
-    public function new(Request $request, Images $images): Response
+    public function createAction(Request $request): Response
     {
         $annonce = new Annonces();
         $form = $this->createForm(AnnoncesType::class, $annonce);
@@ -67,8 +62,9 @@ class AnnoncesController extends AbstractController
                 $img->setName($fichier);
                 $annonce->addImage($img);
             }
-                $this->entityManager->persist($annonce);
-                $this->entityManager->flush();
+
+            $this->entityManager->persist($annonce);
+            $this->entityManager->flush();
         
             return $this->redirectToRoute('annonces_index');
         }
@@ -104,28 +100,28 @@ class AnnoncesController extends AbstractController
         ]);
     }
 
-   /**
- * @Route("/supprime/{id}", name="annonces_delete_image", methods={"DELETE"})
- */
-public function deleteImage(Images $image, Request $request, ManagerRegistry $doctrine){
-    $data = json_decode($request->getContent(), true);
-
-    // On vérifie si le token est valide
-    if($this->isCsrfTokenValid('delete'.$image->getId(), $data['_token'])){
-        // On récupère le nom de l'image
-        $nom = $image->getName();
-        // On supprime le fichier
-        unlink($this->getParameter('images_directory').'/'.$nom);
-
-        // On supprime l'entrée de la base
-        $em = $this->$doctrine->getManager();
-        $em->remove($image);
-        $em->flush();
-
-        // On répond en json
-        return new JsonResponse(['success' => 1]);
-    }else{
-        return new JsonResponse(['error' => 'Token Invalide'], 400);
+    /**
+     * @Route("/supprime/{id}", name="annonces_delete_image", methods={"DELETE"})
+     */
+    public function deleteImage(Images $image, Request $request, ManagerRegistry $doctrine){
+        $data = json_decode($request->getContent(), true);
+    
+        // On vérifie si le token est valide
+        if($this->isCsrfTokenValid('delete'.$image->getId(), $data['_token'])){
+            // On récupère le nom de l'image
+            $nom = $image->getName();
+            // On supprime le fichier
+            unlink($this->getParameter('images_directory').'/'.$nom);
+    
+            // On supprime l'entrée de la base
+            $em = $this->$doctrine->getManager();
+            $em->remove($image);
+            $em->flush();
+    
+            // On répond en json
+            return new JsonResponse(['success' => 1]);
+        }else{
+            return new JsonResponse(['error' => 'Token Invalide'], 400);
+        }
     }
-}
 }
