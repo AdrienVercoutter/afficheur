@@ -68,6 +68,9 @@ class AnnoncesController extends AbstractController
         
             return $this->redirectToRoute('annonces_index');
         }
+            $form = $this->createForm(AnnoncesType::class);
+
+            return $this->render('annonces/new.html.twig', ['form' => $form->createView()]);
     }
 
     /**
@@ -101,7 +104,7 @@ class AnnoncesController extends AbstractController
     }
 
     /**
-     * @Route("/supprime/{id}", name="annonces_delete_image", methods={"DELETE"})
+     * @Route("/supprime/{id}", name="app_delete_image", methods={"DELETE"})
      */
     public function deleteImage(Images $image, Request $request, ManagerRegistry $doctrine){
         $data = json_decode($request->getContent(), true);
