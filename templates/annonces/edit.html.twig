@@ -7,7 +7,7 @@
 
     {{ include('annonces/_form.html.twig', {'button_label': 'Update'}) }}
 
-    <a href="path('app_annonces_index') ">Retour a la Bibliothèque</a>
+    <a href="{{ path('app_annonces_index') }}">Retour a l'accueil </a>
 
     {{ include('annonces/_delete_form.html.twig') }}
 {% endblock %}

@@ -23,6 +23,7 @@
                 <td>
                     <a href="{{ path('app_annonces_show', {'id': annonce.id}) }}">Voir</a>
                     <a href="{{ path('app_annonces_edit', {'id': annonce.id}) }}">Editer</a>
+                    <a href="{{ path('app_annonces_delete',{'id': annonce.id}) }}">Supprimer</a>
                 </td>
             </tr>
         {% else %}

@@ -9,6 +9,7 @@ use App\Repository\AnnoncesRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\DomCrawler\Image;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -66,7 +67,7 @@ class AnnoncesController extends AbstractController
             $this->entityManager->persist($annonce);
             $this->entityManager->flush();
         
-            return $this->redirectToRoute('annonces_index');
+            return $this->redirectToRoute('app_annonces_index');
         }
             $form = $this->createForm(AnnoncesType::class);
 
@@ -103,28 +104,25 @@ class AnnoncesController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/supprime/{id}", name="app_delete_image", methods={"DELETE"})
+    /** 
+     * @Route("/{id}/supprime", name="app_annonces_delete")
      */
-    public function deleteImage(Images $image, Request $request, ManagerRegistry $doctrine){
-        $data = json_decode($request->getContent(), true);
-    
-        // On vérifie si le token est valide
-        if($this->isCsrfTokenValid('delete'.$image->getId(), $data['_token'])){
-            // On récupère le nom de l'image
-            $nom = $image->getName();
-            // On supprime le fichier
-            unlink($this->getParameter('images_directory').'/'.$nom);
-    
-            // On supprime l'entrée de la base
-            $em = $this->$doctrine->getManager();
-            $em->remove($image);
-            $em->flush();
-    
-            // On répond en json
-            return new JsonResponse(['success' => 1]);
-        }else{
-            return new JsonResponse(['error' => 'Token Invalide'], 400);
+    public function deleteImage(Request $request, Images $image): Response
+    {
+      
+        $annonceId = $request->get('id');
+        $annonce = $this->entityManager->getRepository(Annonces::class)->find($annonceId);
+
+        if (null === $annonce) {
+            $this->addFlash('error', sprintf('Impossible de supprimer l\'image avec l\'id %s !', $annonceId));
+
+            return $this->redirectToRoute('app_annonces_index');
+
         }
+        $this->entityManager->remove($image);
+        $this->entityManager->remove($annonce);
+        $this->entityManager->flush();
+
+        return $this->redirectToRoute('app_annonces_index');
     }
 }
